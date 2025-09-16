@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chatbot with Streaming</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f9fc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    #chat-container {
+      width: 400px;
+      max-width: 90vw;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      height: 600px;
+    }
+
+    #chat-window {
+      flex-grow: 1;
+      padding: 20px;
+      overflow-y: auto;
+      border-bottom: 1px solid #eee;
+    }
+
+    .message {
+      margin-bottom: 15px;
+      max-width: 80%;
+      padding: 12px 15px;
+      border-radius: 15px;
+      line-height: 1.4;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+
+    .user-message {
+      background: #007bff;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 0;
+    }
+
+    .bot-message {
+      background: #eee;
+      color: #333;
+      align-self: flex-start;
+      border-bottom-left-radius: 0;
+    }
+
+    #input-area {
+      display: flex;
+      padding: 10px;
+      gap: 10px;
+    }
+
+    #user-input {
+      flex-grow: 1;
+      font-size: 1rem;
+      padding: 10px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    #user-input:focus {
+      border-color: #007bff;
+    }
+
+    #send-btn, #stop-btn {
+      background: #007bff;
+      border: none;
+      color: white;
+      padding: 0 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    #send-btn:hover, #stop-btn:hover {
+      background: #0056b3;
+    }
+
+    #stop-btn {
+      background: #dc3545;
+    }
+
+    #stop-btn:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-container">
+    <div id="chat-window"></div>
+    <div id="input-area">
+      <input type="text" id="user-input" placeholder="Ask me anything about the PDF..." autocomplete="off" />
+      <button id="send-btn">Send</button>
+      <button id="stop-btn" disabled>Stop</button>
+    </div>
+  </div>
+
+  <script>
+    const chatWindow = document.getElementById('chat-window');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    const stopBtn = document.getElementById('stop-btn');
+
+    let controller = null; // For aborting the request
+
+    function appendMessage(content, className) {
+      const msg = document.createElement('div');
+      msg.classList.add('message', className);
+      msg.textContent = content;
+      chatWindow.appendChild(msg);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+      return msg;
+    }
+
+    async function sendQuestion(question) {
+      if (!question.trim()) return;
+
+      appendMessage(question, 'user-message');
+      userInput.value = '';
+      userInput.disabled = true;
+      sendBtn.disabled = true;
+      stopBtn.disabled = false;
+
+      controller = new AbortController();
+
+      try {
+        const response = await fetch('http://localhost:8080/ask-stream', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            filename: "abc_travel_agency_brochure.pdf",
+            question: question
+          }),
+          signal: controller.signal
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        const botMessage = appendMessage('', 'bot-message');
+
+        let done = false;
+        while (!done) {
+          const { value, done: doneReading } = await reader.read();
+          done = doneReading;
+          if (value) {
+            const chunk = decoder.decode(value, { stream: true });
+            botMessage.textContent += chunk;
+            console.log('Streamed chunk:', chunk);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+          }
+        }
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          appendMessage('[Response stopped by user]', 'bot-message');
+        } else {
+          appendMessage('Error: ' + error.message, 'bot-message');
+        }
+      } finally {
+        controller = null;
+        userInput.disabled = false;
+        sendBtn.disabled = false;
+        stopBtn.disabled = true;
+        userInput.focus();
+      }
+    }
+
+    sendBtn.addEventListener('click', () => {
+      sendQuestion(userInput.value);
+    });
+
+    userInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') {
+        sendQuestion(userInput.value);
+      }
+    });
+
+    stopBtn.addEventListener('click', () => {
+      if (controller) {
+        controller.abort();
+        stopBtn.disabled = true;
+      }
+    });
+  </script>
+</body>
+</html>
+

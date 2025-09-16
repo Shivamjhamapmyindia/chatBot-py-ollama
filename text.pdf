@@ -1,0 +1,64 @@
+📄 ABC Travel Agency - Internal Testing & Documentation
+🏢 Company Overview
+
+ABC Travel Agency specializes in offering seamless flight booking services and efficient customer support for frequently asked questions (FAQs). We aim to deliver a smooth and convenient travel experience for our customers with real-time ticketing, PNR management, and flight itinerary handling.
+
+✈️ Services Offered
+
+Flight Booking
+
+Domestic & International Flights
+
+Instant PNR generation
+
+E-ticket delivery via email/SMS
+
+Multi-city & round-trip support
+
+Customer Support (FAQs)
+
+Flight change/cancellation policies
+
+Baggage allowance
+
+Visa/passport requirements
+
+Check-in guidelines
+
+Refund processing
+
+Special assistance (meals, wheelchairs, etc.)
+
+
+🧪 Test Data: Sample Passenger & Booking Information
+S.No	Passenger Name	Email	Contact Number	Flight Number	PNR Code	Origin	Destination	Travel Date	Status
+1	Rahul Sharma	rahul@example.com
+	+91-9876543210	AI203	PNR12345	Delhi	Mumbai	2025-10-05	Confirmed
+2	Aisha Khan	aisha@example.com
+	+91-9876543211	UK874	PNR12346	Mumbai	London	2025-11-15	Confirmed
+3	John Dsouza	john@example.com
+	+91-9876543212	EK505	PNR12347	Hyderabad	Dubai	2025-12-01	Confirmed
+4	Sneha Patel	sneha@example.com
+	+91-9876543213	AI411	PNR12348	Ahmedabad	Delhi	2025-09-25	Cancelled
+5	Arjun Mehta	arjun@example.com
+	+91-9876543214	BA138	PNR12349	Delhi	New York	2025-12-18	Confirmed
+6	Priya Verma	priya@example.com
+	+91-9876543215	AI983	PNR12350	Chennai	Singapore	2025-10-12	Confirmed
+7	Devansh Kulkarni	devansh@example.com
+	+91-9876543216	SG222	PNR12351	Pune	Bangalore	2025-09-30	Confirmed
+8	Fatima Noor	fatima@example.com
+	+91-9876543217	AI144	PNR12352	Lucknow	Dubai	2025-11-03	Hold
+9	Rakesh Yadav	rakesh@example.com
+	+91-9876543218	LH761	PNR12353	Delhi	Frankfurt	2025-10-22	Confirmed
+10	Kavita Nair	kavita@example.com
+	+91-9876543219	AI302	PNR12354	Kochi	Mumbai	2025-09-28	Confirmed
+
+🔒 Note: All PNRs and passenger data listed above are mock/test data for internal testing purposes only.
+
+🛠️ Suggestions for Integration & Testing
+
+Use the above data for backend testing of booking APIs.
+
+Validate PNR status lookup and email notifications.
+
+Check customer support flow for FAQ-based queries using passenger email or phone number.

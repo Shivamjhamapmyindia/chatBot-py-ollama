@@ -1,0 +1,24 @@
+curl -N -X POST "http://127.0.0.1:8000/ask-stream" \
+ -H "Content-Type: application/json" \
+ -d '{"filename":"abc_travel_agency_brochure.pdf","question":"What services do you offer?"}'
+
+
+curl -X POST "http://127.0.0.1:8000/ask" \
+ -H "Content-Type: application/json" \
+ -d '{"filename":"abc_travel_agency_brochure.pdf","question":"What services do you offer?"}'
+
+
+nomic-embed-text:v1.5
+phi3:3.8b//good
+gemma3:1b //slow
+qwen3:0.6b// Good in low size
+
+{
+    "filename": "abc_travel_agency_brochure.pdf",
+    "question": "Tell me about all pacakages?"
+}
+
+how to contact for booking?
+
+
+uvicorn test:app --host 127.0.0.1 --port 8080 --reload
