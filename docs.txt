@@ -22,3 +22,13 @@ how to contact for booking?
 
 
 uvicorn test:app --host 127.0.0.1 --port 8080 --reload
+
+
+
+#safe python env
+
+python -m venv venv
+
+source venv/bin/activate
+
+deactivate
